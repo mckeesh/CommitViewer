@@ -1,0 +1,74 @@
+Foo.java
+public class Foo {
+	
+	String fooType;
+	
+	public Foo(){
+		fooType = \"foo2\";
+	}
+	
+	public void setFooType(String type){
+		fooType = type;
+	}
+	
+	public String getFooType(){
+		return fooType;
+	}
+	
+	public void takeActionForType(String type){
+		switch(fooType){
+			case null:
+				throw new RuntimeException(\"No type set for your foo!\");
+			case \"\": 
+				throw new RuntimeException(\"No type set for your foo!\");
+			case \"foo2\":
+				takeAction1();
+				break;
+			case \"foo3\":
+				takeAction2();
+				break;
+			default:
+				takeAction3();
+				break;
+		}
+	}
+	
+	public void takeAction1(){
+		System.out.println(\"Action 1!\");
+	}
+	
+	public void takeAction2(){
+		System.out.println(\"Action 2!\");
+	}
+	
+	public void takeAction3(){
+		System.out.println(\"Action 2!\");
+	}
+}
+	
+file1.txt
+line added on commit 1
+1f
+2f
+3f
+4
+5
+6
+7
+8
+9
+10
+	
+file2.txt
+added on first commit
+1f
+2f
+3f
+4
+5
+6
+7
+8
+9
+10
+	

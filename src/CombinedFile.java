@@ -45,8 +45,15 @@ class CombinedFile implements JSONAware {
 
 	@Override
 	public String toJSONString() {
-		return "{\"A-only\": " + JSONObject.escape(getVersion(ChunkOwner.A)) +
-				", \"B-only\": " + JSONObject.escape(getVersion(ChunkOwner.B)) + "}";
+		return "{\"A-only\":\n" + JSONObject.escape(getVersion(ChunkOwner.A)) +
+				", \"B-only\":\n" + JSONObject.escape(getVersion(ChunkOwner.B)) + "}";
 	}
-
+	
+	public String toJSONStringA(){
+		return JSONObject.escape(getVersion(ChunkOwner.A)); 
+	}
+	
+	public String toJSONStringB(){
+		return JSONObject.escape(getVersion(ChunkOwner.B)); 
+	}
 }

@@ -5,6 +5,7 @@ import java.io.PrintWriter;
 import java.io.UnsupportedEncodingException;
 import java.util.Arrays;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 
 import org.eclipse.jgit.errors.RevisionSyntaxException;
@@ -15,23 +16,29 @@ import org.eclipse.jgit.revwalk.RevWalk;
 
 
 public class DataScraper {
-	PrintWriter writer = null;
+	PrintWriter writerA = null;
+	PrintWriter writerB = null;
+	public enum Owner {A, B};
 	
 	public DataScraper(String resultsFilePath, String resultsFileName) throws IOException{
 		
-		File file = new File(resultsFilePath, resultsFileName);
-	    if (!file.isFile() && !file.createNewFile()){
-			throw new IOException("Error creating new file: " + file.getAbsolutePath());
-	    }
+//		createFileIfDoesntExist(resultsFilePath, resultsFileName);
 	    
 		try {
-			writer = new PrintWriter(resultsFilePath + resultsFileName, "UTF-8");
+			writerA = new PrintWriter(resultsFilePath + "resultsA.txt", "UTF-8");
+			writerB = new PrintWriter(resultsFilePath + "resultsB.txt", "UTF-8");
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
 		} catch (UnsupportedEncodingException e) {
 			e.printStackTrace();
 		}
+	}
 
+	private void createFileIfDoesntExist(String resultsFilePath, String resultsFileName) throws IOException {
+		File file = new File(resultsFilePath, resultsFileName);
+	    if (!file.isFile() && !file.createNewFile()){
+			throw new IOException("Error creating new file: " + file.getAbsolutePath());
+	    }
 	}
 
 	public void walkRepo(Repository repository){
@@ -56,7 +63,8 @@ public class DataScraper {
 		  previousCommit = commit;
 		}
 		rw.dispose();
-		writer.close();
+		writerA.close();
+		writerB.close();
 	}
 	
 	private void printMergedResult(Repository repository, RevCommit commitA, RevCommit commitB){
@@ -69,24 +77,42 @@ public class DataScraper {
 			e.printStackTrace();
 		}
 		
+		writeResultsToFile(fileMap, writerA, Owner.A);
+		writeResultsToFile(fileMap, writerB, Owner.B);
+	}
+	
+	private void writeResultsToFile(Map<String, CombinedFile> fileMap, PrintWriter writer, Owner owner){
 		if(fileMap != null){
 			for(String str : fileMap.keySet()){
 				System.out.println(str);
 				writer.println(str);
 				CombinedFile combined = fileMap.get(str);
 				if(combined != null){
-					String json = combined.toJSONString();
-					System.out.println(json.contains("\\n"));
-					String lines[] = json.split("\\\\n");
-					for(String jsonElement : lines) {
-						System.out.println(jsonElement);
+					String diff;
+					if(owner == Owner.A){
+						diff = combined.toJSONStringA();
+					} else {
+						diff = combined.toJSONStringB();
 					}
+					diff = replaceTabs(diff);
 					
-					for(String jsonElement : json.split("\\n")) {
+					String lines[] = diff.split("\\\\n");
+					for(String jsonElement : lines) {
 						writer.println(jsonElement);
+						System.out.println(jsonElement);
 					}
 				}
 			}
 		}
+	}
+	
+	//Java replace function being a real a-hole
+	private String replaceTabs(String str){ 
+		List<String> splitList = Arrays.asList(str.split("\\\\t"));
+		String strSum = "";
+		for(String strElement : splitList){
+			strSum += strElement + "\t";
+		}
+		return strSum;
 	}
 }
