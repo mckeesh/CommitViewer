@@ -1,6 +1,8 @@
 import java.util.Arrays;
 import java.util.List;
 
+import org.gitective.core.Assert;
+
 
 public class Formatter {
 	public static String formatDiff(String diff){
@@ -16,8 +18,9 @@ public class Formatter {
 		return formattedDiff;
 	}
 
-	//Java replace function being a real a-hole
+	//Java replace function being a real a-hole, so I wrote my own
 	private static String replaceTabs(String str){ 
+		Assert.notNull(str);
 		List<String> splitList = Arrays.asList(str.split("\\\\t"));
 		String strSum = "";
 		for(String strElement : splitList){

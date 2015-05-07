@@ -61,9 +61,10 @@ public class UIDataRetriever {
 			
 			CommitStatus commitStatus = mMerger.recreateMerge(commit);
 			List<String> conflictedFiles = commitStatus.getListOfConflictingFiles();
-		
+			
 			 if(conflictedFiles.size() != 0){
 				  for(String conflictedFile : conflictedFiles){
+					  System.out.println(conflictedFile);
 					  metaMerge.fileToCompletedMerge.put(conflictedFile, commitStatus.getSolvedVersion(conflictedFile));
 					  CombinedFile combinedFile = commitStatus.getCombinedFile(conflictedFile);
 					  metaMerge.fileToA.put(conflictedFile, combinedFile.toJSONStringA());
@@ -72,52 +73,10 @@ public class UIDataRetriever {
 				  
 				  metaMerge.conflictExists = true;
 			  }
-			 
 			 return metaMerge;
 		} catch(IllegalArgumentException e) {
 			metaMerge.conflictExists = false;
 			return metaMerge;
 		}
-	}
-	
-	private String getMergedTextA(Repository repository, RevCommit commitA, RevCommit commitB){
-		Merger merger = new Merger();
-		Map<String, CombinedFile> fileMap = null;
-		
-		try {
-			fileMap = merger.merge(repository, commitA, commitB);
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-		
-		return getResultsString(fileMap, Owner.A);
-	}
-	
-	private String getMergedTextB(Repository repository, RevCommit commitA, RevCommit commitB){
-		Merger merger = new Merger();
-		Map<String, CombinedFile> fileMap = null;
-		
-		try {
-			fileMap = merger.merge(repository, commitA, commitB);
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-		
-		return getResultsString(fileMap, Owner.B);
-	}
-	
-	private String getResultsString(Map<String, CombinedFile> fileMap, Owner owner){
-		String results = "";
-		if(fileMap != null){
-			for(String str : fileMap.keySet()){
-				System.out.println(str);
-				CombinedFile combined = fileMap.get(str);
-				if(combined != null){
-					results += combined.getDiff(owner);
-				}
-			}
-		}
-		
-		return results;
 	}
 }

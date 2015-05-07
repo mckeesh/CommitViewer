@@ -9,20 +9,10 @@ import org.eclipse.jgit.revwalk.RevCommit;
 public class Main {
 
 	public static void main(String[] args) {
-		Repository repo = RepositoryRetriever.get("/Users/Shane/TestGitRepo/.git");
-		UIDataRetriever dataRetriever = new UIDataRetriever(repo);
-		Map<RevCommit, MetaMerge> commitToMergeMap = dataRetriever.walkRepo();
+		Repository repo = RepositoryRetriever.get("/Users/Shane/mergeconflict/repos/AndEngine/.git");
 		
-		MetaMerge firstMerge = commitToMergeMap.get(commitToMergeMap.keySet().toArray()[0]);
-		String firstFileA = firstMerge.fileToA.get(firstMerge.fileToA.keySet().toArray()[0]);
-		String firstFileB = firstMerge.fileToB.get(firstMerge.fileToB.keySet().toArray()[0]);
-		String firstFileCombined= firstMerge.fileToCompletedMerge.get(firstMerge.fileToCompletedMerge.keySet().toArray()[0]);
-		
-		ConflictViewerUI ui = new ConflictViewerUI(1440, 900);
+		ConflictViewerUI ui = new ConflictViewerUI(1440, 900, repo);
 	    ui.setVisible(true);
-	    ui.setTextA(Formatter.formatDiff(firstFileA));
-	    ui.setTextB(Formatter.formatDiff(firstFileB));
-	    ui.setTextSolved(Formatter.formatDiff(firstFileCombined));
 	    ui.setResizable(true);
 	}
 }
