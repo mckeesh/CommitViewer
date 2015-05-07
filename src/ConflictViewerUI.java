@@ -1,5 +1,9 @@
-import java.awt.GridLayout;
+import java.awt.Dimension;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 
+import javax.swing.Box;
+import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JScrollPane;
@@ -11,6 +15,11 @@ public class ConflictViewerUI extends JFrame {
 	JTextArea textAreaB;
 	JTextArea textAreaSolved;
 	
+	JButton nextButton;
+	JButton backButton;
+	JButton randomButton;
+	
+	int commitNumber = 0;
 	
     public ConflictViewerUI(int x, int y) {
 		setTitle("A vs. B vs. Solved");
@@ -30,10 +39,53 @@ public class ConflictViewerUI extends JFrame {
 		textAreaSolved.setEditable(false);
 		JScrollPane scrollPanelSolved = new JScrollPane(textAreaSolved);
 		
-		this.setLayout(new GridLayout(1,3));
-		this.add(scrollPanelA);
-		this.add(scrollPanelB);
-		this.add(scrollPanelSolved);
+		nextButton = new JButton("Next");
+		backButton = new JButton("Back");
+		randomButton = new JButton("Random");
+		nextButton.setMaximumSize(new Dimension(300, 150));
+		backButton.setMaximumSize(new Dimension(300, 150));
+		randomButton.setMaximumSize(new Dimension(300, 150));
+		addActionListenersToButtons();
+		
+		getContentPane().setLayout(new BoxLayout(getContentPane(), BoxLayout.PAGE_AXIS));
+		Box buttonBox = Box.createHorizontalBox();
+		buttonBox.add(nextButton);
+		buttonBox.add(backButton);
+		buttonBox.add(randomButton);
+		
+		Box pageBox = Box.createHorizontalBox();
+		pageBox.add(scrollPanelA);
+		pageBox.add(scrollPanelB);
+		pageBox.add(scrollPanelSolved);
+		
+		this.add(buttonBox);
+		this.add(pageBox);
+    }
+    
+    public void addActionListenersToButtons() {
+    	nextButton.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e)
+            {
+                //Execute when button is pressed
+                System.out.println();
+            }
+        });
+    	
+    	backButton.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e)
+            {
+                //Execute when button is pressed
+                System.out.println("You clicked the button");
+            }
+        });
+    	
+    	randomButton.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e)
+            {
+                //Execute when button is pressed
+                System.out.println("You clicked the button");
+            }
+        });
     }
     
     public void setTextA(String str){
