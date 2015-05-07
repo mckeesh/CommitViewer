@@ -1,6 +1,7 @@
 
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -55,5 +56,33 @@ class CombinedFile implements JSONAware {
 	
 	public String toJSONStringB(){
 		return JSONObject.escape(getVersion(ChunkOwner.B)); 
+	}
+	
+	public String getDiff(Owner owner){
+		String diff;
+		String formattedDiff = "";
+		if(owner == Owner.A){
+			diff = this.toJSONStringA();
+		} else {
+			diff = this.toJSONStringB();
+		}
+		diff = replaceTabs(diff);
+		
+		String lines[] = diff.split("\\\\n");
+		for(String jsonElement : lines) {
+			formattedDiff += (jsonElement + "\n");
+		}
+		
+		return formattedDiff;
+	}
+	
+	//Java replace function being a real a-hole
+	private String replaceTabs(String str){ 
+		List<String> splitList = Arrays.asList(str.split("\\\\t"));
+		String strSum = "";
+		for(String strElement : splitList){
+			strSum += strElement + "\t";
+		}
+		return strSum;
 	}
 }

@@ -20,7 +20,7 @@ public class DataScraper {
 	PrintWriter writerB = null;
 	public enum Owner {A, B};
 	
-	public DataScraper(String resultsFilePath, String resultsFileName) throws IOException{
+	public DataScraper(String resultsFilePath) throws IOException{
 		
 //		createFileIfDoesntExist(resultsFilePath, resultsFileName);
 	    
