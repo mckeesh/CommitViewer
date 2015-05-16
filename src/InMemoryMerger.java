@@ -1,5 +1,4 @@
 import java.io.IOException;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -17,15 +16,14 @@ import org.eclipse.jgit.revwalk.RevCommit;
 public class InMemoryMerger {
 	
 	private final Repository repository;
-	private final List<String> names;
 	
 	public InMemoryMerger(Repository repository) {
 		this.repository = repository;
-		names = Arrays.asList(new String[]{"base", "A", "B"});
 	}
 	
 	public CommitStatus recreateMerge(RevCommit mergeCommit) {
 		RevCommit[] parents = mergeCommit.getParents();
+		
 		if (parents.length < 2)
 			throw new IllegalArgumentException();
 		
@@ -41,10 +39,11 @@ public class InMemoryMerger {
 		
 		RecursiveMerger recursiveMerger = (RecursiveMerger) new StrategyRecursive().newMerger(repository, true);
 		
-		if (first.getCommitTime() < second.getCommitTime())
+		if (first.getCommitTime() < second.getCommitTime()){
 			recursiveMerger.merge(second,first);
-		else
+		} else {
 			recursiveMerger.merge(first, second);
+		}
 		
 		Map<String, MergeResult<? extends Sequence>> mergeResults = recursiveMerger.getMergeResults();
 		for (String touchedFile : mergeResults.keySet()) {
@@ -63,7 +62,7 @@ public class InMemoryMerger {
 		
 		return combinedFile;
 	}
-
+	
 	private void processChunk(MergeChunk mergeChunk, List<? extends Sequence> sequences, CombinedFile combinedFile) {
 		ConflictState conflictState = mergeChunk.getConflictState();
 		int beginIndex = mergeChunk.getBegin();

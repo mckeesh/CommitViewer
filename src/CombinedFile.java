@@ -9,26 +9,10 @@ import org.json.simple.JSONAware;
 import org.json.simple.JSONObject;
 
 class CombinedFile implements JSONAware {
-
-	private class Chunk {
-		private ChunkOwner owner;
-		private String content;
-
-		public Chunk(ChunkOwner owner, String content) {
-			this.owner = owner;
-			this.content = content;
-		}
-
-		public boolean isOwner(ChunkOwner a) {
-			if (owner.equals(ChunkOwner.BOTH))
-				return true;
-			
-			return owner.equals(a);
-		}
-
-		public String getContent() {
-			return content;
-		}
+	
+	public class Tuple{
+		public Chunk beginning;
+		public Chunk end;
 	}
 
 	private List<Chunk> chunks = new ArrayList<Chunk>();
@@ -50,22 +34,69 @@ class CombinedFile implements JSONAware {
 				", \"B-only\":\n" + JSONObject.escape(getVersion(ChunkOwner.B)) + "}";
 	}
 	
-	public String toJSONStringA(){
-		return JSONObject.escape(getVersion(ChunkOwner.A)); 
+	public String toStringAll(){
+		String str = "";
+		for(Chunk chunk : chunks){
+				str += (chunk.getContent());
+		}
+		return str;
 	}
 	
-	public String toJSONStringB(){
-		return JSONObject.escape(getVersion(ChunkOwner.B)); 
+	public String toStringA(){
+		String str = "";
+		for(Chunk chunk : chunks){
+			if(chunk.owner == ChunkOwner.A) {
+				str += (chunk.getContent());
+			}
+		}
+		return str;
 	}
 	
-	public String getDiff(Owner owner){
+	public String toStringB(){
+		String str = "";
+		for(Chunk chunk : chunks){
+			if(chunk.owner == ChunkOwner.B) {
+				str += (chunk.getContent());
+			}
+		}
+		return str;
+	}
+	
+	public String toStringBoth(){
+		String str = "";
+		for(Chunk chunk : chunks){
+			if(chunk.owner == ChunkOwner.BOTH) {
+				str += (chunk.getContent());
+			}
+		}
+		return str;
+	}
+	
+	public String getUnresolvedString(String conflictedFile){
+		String unresolvedText = conflictedFile + 
+		  "\n<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<\nVERSION A:\n" + 
+		  toStringA() + 
+		  "\n------------------------------------------------------------\nVERSION B:\n" + 
+		  toStringB() + 
+		  ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>";
+		return unresolvedText;
+	}
+	
+	public List<Chunk> getChunks(){
+		return chunks;
+	}
+	
+	public String getDiff(ChunkOwner owner){
 		String diff;
 		String formattedDiff = "";
-		if(owner == Owner.A){
-			diff = this.toJSONStringA();
+		if(owner == ChunkOwner.A){
+			diff = this.toStringA();
+		} else if(owner == ChunkOwner.B){
+			diff = this.toStringB();
 		} else {
-			diff = this.toJSONStringB();
+			diff = this.toStringBoth();
 		}
+		
 		diff = replaceTabs(diff);
 		
 		String lines[] = diff.split("\\\\n");

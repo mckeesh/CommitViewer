@@ -4,6 +4,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.lang.StringUtils;
 import org.eclipse.jgit.errors.RevisionSyntaxException;
 import org.eclipse.jgit.lib.ObjectId;
 import org.eclipse.jgit.lib.Repository;
@@ -25,7 +26,6 @@ public class UIDataRetriever {
 		Map<RevCommit, MetaMerge> commitToMergeMap = new HashMap<RevCommit, MetaMerge>();
 		RevWalk rw = new RevWalk(mRepository);
 		ObjectId HEAD;
-//		Map<Owner, String> ownerToDiffsMap = new HashMap<Owner, String>();
 		
 		try {
 			HEAD = mRepository.resolve("HEAD");
@@ -46,9 +46,6 @@ public class UIDataRetriever {
 			  }
 		}
 		
-//		ownerToDiffsMap.put(Owner.A, aDiffs);
-//		ownerToDiffsMap.put(Owner.B, bDiffs);
-		
 		rw.dispose();
 		
 		return commitToMergeMap;
@@ -64,16 +61,19 @@ public class UIDataRetriever {
 			
 			 if(conflictedFiles.size() != 0){
 				  for(String conflictedFile : conflictedFiles){
-					  System.out.println(conflictedFile);
-					  metaMerge.fileToCompletedMerge.put(conflictedFile, commitStatus.getSolvedVersion(conflictedFile));
 					  CombinedFile combinedFile = commitStatus.getCombinedFile(conflictedFile);
-					  metaMerge.fileToA.put(conflictedFile, combinedFile.toJSONStringA());
-					  metaMerge.fileToB.put(conflictedFile, combinedFile.toJSONStringB());
+					  metaMerge.fileToA.put(conflictedFile, combinedFile.toStringA());
+					  metaMerge.fileToB.put(conflictedFile, combinedFile.toStringB());
+					  String diffSolved = StringUtils.difference(commitStatus.getSolvedVersion(conflictedFile), combinedFile.toStringAll());
+					  metaMerge.fileToCompletedMerge.put(conflictedFile, diffSolved);
+					  metaMerge.fileToUnresolved.put(conflictedFile, combinedFile.getUnresolvedString(conflictedFile)); 
 				  }
 				  
 				  metaMerge.conflictExists = true;
 			  }
+			 
 			 return metaMerge;
+		
 		} catch(IllegalArgumentException e) {
 			metaMerge.conflictExists = false;
 			return metaMerge;

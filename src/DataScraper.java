@@ -90,9 +90,9 @@ public class DataScraper {
 				if(combined != null){
 					String diff;
 					if(owner == Owner.A){
-						diff = combined.toJSONStringA();
+						diff = combined.toStringA();
 					} else {
-						diff = combined.toJSONStringB();
+						diff = combined.toStringB();
 					}
 					diff = replaceTabs(diff);
 					

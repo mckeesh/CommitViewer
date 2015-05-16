@@ -1,16 +1,18 @@
 import java.awt.Dimension;
+import java.awt.Point;
+import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JScrollPane;
+import javax.swing.JSplitPane;
 import javax.swing.JTextArea;
 
 import org.eclipse.jgit.lib.Repository;
@@ -18,8 +20,7 @@ import org.eclipse.jgit.revwalk.RevCommit;
 
 public class ConflictViewerUI extends JFrame {
 
-	JTextArea textAreaA;
-	JTextArea textAreaB;
+	JTextArea textAreaUnresolved;
 	JTextArea textAreaSolved;
 	
 	JButton nextFileButton;
@@ -39,58 +40,84 @@ public class ConflictViewerUI extends JFrame {
     public ConflictViewerUI(int x, int y, Repository repo) {
     	repository = repo;
     	dataRetriever = new UIDataRetriever(repository);
-		setTitle("A vs. B vs. Solved");
-		setSize(x, y);
-		setLocationRelativeTo(null);
+    	
+    	Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
+    	
+		setTitle("A + B vs. Solved");
+		setSize(screenSize.width-200, screenSize. height);
+		setLocation(new Point(0,0));
 		setDefaultCloseOperation(EXIT_ON_CLOSE);
 		
-		textAreaA = new JTextArea();
-		textAreaA.setEditable(false);
-		JScrollPane scrollPanelA = new JScrollPane(textAreaA);
+		JFrame buttonFrame = new JFrame();
 		
-		textAreaB = new JTextArea();
-		textAreaB.setEditable(false);
-		JScrollPane scrollPanelB = new JScrollPane(textAreaB);
+		textAreaUnresolved = new JTextArea();
+		textAreaUnresolved.setEditable(false);
+		JScrollPane scrollPanelA = new JScrollPane(textAreaUnresolved);
+		
+//		textAreaB = new JTextArea();
+//		textAreaB.setEditable(false);
+//		JScrollPane scrollPanelB = new JScrollPane(textAreaB);
 		
 		textAreaSolved = new JTextArea();
 		textAreaSolved.setEditable(false);
 		JScrollPane scrollPanelSolved = new JScrollPane(textAreaSolved);
 		
+		JSplitPane splitPanel = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, scrollPanelA, scrollPanelSolved);
+		splitPanel.setOneTouchExpandable(true);
+		splitPanel.setDividerLocation(150);
+		
 		nextFileButton = new JButton("Next File");
 		backFileButton = new JButton("Back File");
 		randomFileButton = new JButton("Random File");
-		nextFileButton.setMaximumSize(new Dimension(300, 150));
-		backFileButton.setMaximumSize(new Dimension(300, 150));
-		randomFileButton.setMaximumSize(new Dimension(300, 150));
+		nextFileButton.setMaximumSize(new Dimension(200, 150));
+		backFileButton.setMaximumSize(new Dimension(200, 150));
+		randomFileButton.setMaximumSize(new Dimension(200, 150));
 		
 		nextCommitButton = new JButton("Next Commit");
 		backCommitButton = new JButton("Back Commit");
 		randomCommitButton = new JButton("Random Commit");
-		nextCommitButton.setMaximumSize(new Dimension(300, 150));
-		backCommitButton.setMaximumSize(new Dimension(300, 150));
-		randomCommitButton.setMaximumSize(new Dimension(300, 150));
+		nextCommitButton.setMaximumSize(new Dimension(200, 150));
+		backCommitButton.setMaximumSize(new Dimension(200, 150));
+		randomCommitButton.setMaximumSize(new Dimension(200, 150));
 		
 		addActionListenersToButtons();
 		
-		getContentPane().setLayout(new BoxLayout(getContentPane(), BoxLayout.PAGE_AXIS));
-		Box fileButtonBox = Box.createHorizontalBox();
+		buttonFrame.getContentPane().setLayout(new BoxLayout(buttonFrame.getContentPane(), BoxLayout.PAGE_AXIS));
+				
+		Box fileButtonBox = Box.createVerticalBox();
 		fileButtonBox.add(nextFileButton);
 		fileButtonBox.add(backFileButton);
 		fileButtonBox.add(randomFileButton);
 		
-		Box commitButtonBox = Box.createHorizontalBox();
+		Box commitButtonBox = Box.createVerticalBox();
 		commitButtonBox.add(nextCommitButton);
 		commitButtonBox.add(backCommitButton);
 		commitButtonBox.add(randomCommitButton);
 		
-		Box pageBox = Box.createHorizontalBox();
-		pageBox.add(scrollPanelA);
-		pageBox.add(scrollPanelB);
-		pageBox.add(scrollPanelSolved);
+		buttonFrame.add(fileButtonBox);
+		buttonFrame.add(commitButtonBox);
 		
-		this.add(fileButtonBox);
-		this.add(commitButtonBox);
-		this.add(pageBox);
+		this.add(splitPanel);
+		
+		buttonFrame.setVisible(true);
+		buttonFrame.setSize(200, screenSize.height);
+		buttonFrame.setLocation(new Point(screenSize.width-200, 0));
+		buttonFrame.setDefaultCloseOperation(EXIT_ON_CLOSE);
+		
+//		Box pageBox = Box.createHorizontalBox();
+//		pageBox.add(scrollPanelA);
+////		pageBox.add(scrollPanelB);
+//		pageBox.add(scrollPanelSolved);
+//		JPanel buttonPanel = new JPanel();
+//		buttonPanel.add(fileButtonBox);
+//		buttonPanel.add(commitButtonBox);
+//		buttonsBox.add(buttonPanel);
+//		
+//		buttonsBox.add(splitPanel);
+//		this.add(buttonsBox);
+//		this.add(fileButtonBox);
+//		this.add(commitButtonBox);
+//		this.add(splitPanel);
 		
 		setupData();
     }
@@ -167,15 +194,16 @@ public class ConflictViewerUI extends JFrame {
         });
     }
     
-    public void setTextA(String str){
-    	textAreaA.setText(str);
+    public void setTextUnresolved(String str){
+    	textAreaUnresolved.setText(str);
     }
     
-    public void setTextB(String str){
-    	textAreaB.setText(str);
-    }
+//    public void setTextB(String str){
+//    	textAreaB.setText(str);
+//    }
     
     public void setTextSolved(String str){
+    	
     	textAreaSolved.setText(str);
     }
     
@@ -190,8 +218,8 @@ public class ConflictViewerUI extends JFrame {
     	if(files.size() > 0){
     		fileName = files.get(0);
     	} else {
-    		setTextA("No Merge Conflicts for commit");
-		    setTextB("No Merge Conflicts for commit");
+    		setTextUnresolved("No Merge Conflicts for commit");
+//		    setTextB("No Merge Conflicts for commit");
 		    setTextSolved("No Merge Conflicts for commit");
     	}
     	refreshApp();
@@ -202,22 +230,20 @@ public class ConflictViewerUI extends JFrame {
     	commit = (RevCommit)(commitToMergeMap.keySet().toArray()[0]);
     	MetaMerge firstMerge = commitToMergeMap.get(commitToMergeMap.keySet().toArray()[0]);
     	fileName = (String)(firstMerge.fileToA.keySet().toArray()[0]);
-		String firstFileA = firstMerge.fileToA.get(fileName);
-		String firstFileB = firstMerge.fileToB.get(fileName);
-		String firstFileCombined= firstMerge.fileToCompletedMerge.get(fileName);
-		setTextA(Formatter.formatDiff(firstFileA));
-	    setTextB(Formatter.formatDiff(firstFileB));
-	    setTextSolved(Formatter.formatDiff(firstFileCombined));
+		String comboFile = firstMerge.fileToUnresolved.get(fileName);
+		String firstFileSolved= firstMerge.fileToCompletedMerge.get(fileName);
+		if(comboFile != null && firstFileSolved != null){
+			setTextUnresolved(Formatter.formatDiff(comboFile));
+			setTextSolved(Formatter.formatDiff(firstFileSolved));
+		}
     }
     
     public void refreshApp(){
     	MetaMerge merge = commitToMergeMap.get(commit);
-		String fileA = merge.fileToA.get(fileName);
-		String fileB = merge.fileToB.get(fileName);
+    	String comboFile = merge.fileToUnresolved.get(fileName);
 		String fileCombined= merge.fileToCompletedMerge.get(fileName);
-		if(fileA != null && fileB != null && fileCombined != null){
-			setTextA(Formatter.formatDiff(fileA));
-		    setTextB(Formatter.formatDiff(fileB));
+		if(comboFile != null && fileCombined != null){
+			setTextUnresolved(Formatter.formatDiff(comboFile));
 		    setTextSolved(Formatter.formatDiff(fileCombined));
 		}
     }
