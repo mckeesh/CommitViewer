@@ -46,7 +46,7 @@ class CombinedFile implements JSONAware {
 		String str = "";
 		for(Chunk chunk : chunks){
 			if(chunk.owner == ChunkOwner.A) {
-				str += (chunk.getContent());
+				str += (chunk.getContent() + "\n*********************************************\n");
 			}
 		}
 		return str;
@@ -55,8 +55,8 @@ class CombinedFile implements JSONAware {
 	public String toStringB(){
 		String str = "";
 		for(Chunk chunk : chunks){
-			if(chunk.owner == ChunkOwner.B) {
-				str += (chunk.getContent());
+			if(chunk.owner == ChunkOwner.B ) {
+				str += (chunk.getContent() + "\n*********************************************\n");
 			}
 		}
 		return str;

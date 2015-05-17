@@ -29,7 +29,8 @@ public class UIDataRetriever {
 		
 		try {
 			HEAD = mRepository.resolve("HEAD");
-			rw.markStart(rw.parseCommit(HEAD));
+			RevCommit headCommit = rw.parseCommit(HEAD);
+			rw.markStart(headCommit);
 		} catch (IOException e) {
 			e.printStackTrace();
 		} catch (RevisionSyntaxException e1) {
